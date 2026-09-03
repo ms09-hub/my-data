@@ -87,7 +87,7 @@ try:
         value=(min_year, max_year)
     )
     
-    # 이상치(유난히 낮은 기온) 기준 설정 (기본값: 10.0°C 이하)
+    # 이상치(유난히 낮은 기온) 기준 설정
     low_temp_threshold = st.sidebar.number_input(
         "❄️ '유난히 낮은 연도' 기준 기온 (°C 이하)",
         min_value=0.0,
@@ -128,7 +128,7 @@ try:
 
     st.markdown("---")
     
-    # 7. 연평균 기온 변화 차트 (특이 연도 강조)
+    # 7. 연평균 기온 변화 차트
     st.subheader("📈 서울 연평균 기온 변화 추이 (이상 연도 강조)")
     
     fig = go.Figure()
@@ -156,7 +156,7 @@ try:
         )
     )
     
-    # (3) 유난히 낮은 연도 빨간색 X 큰 마커 및 기온 텍스트 강조
+    # (3) 유난히 낮은 연도 강조 (여백 확보를 위해 textposition 수정)
     if len(low_temp_df) > 0:
         fig.add_trace(
             go.Scatter(
@@ -164,25 +164,25 @@ try:
                 y=low_temp_df["연평균기온"],
                 mode="markers+text",
                 name=f"유난히 낮은 연도 (≤{low_temp_threshold}°C)",
-                marker=dict(color="red", size=14, symbol="x"),
+                marker=dict(color="red", size=12, symbol="x"),
                 text=[f"{y}년<br>{t}°C" for y, t in zip(low_temp_df["연도"], low_temp_df["연평균기온"])],
                 textposition="bottom center",
-                textfont=dict(color="red", size=11)
+                textfont=dict(color="red", size=10)
             )
         )
     
-    # (4) 값이 비어있는 연도(결측) 회색 영역 및 세로 주석 강조
+    # (4) 값이 비어있는 연도(결측) 회색 영역 및 주석
     for m_year in missing_years_df["연도"]:
         fig.add_vrect(
             x0=m_year - 0.5,
             x1=m_year + 0.5,
             fillcolor="gray",
-            opacity=0.3,
+            opacity=0.25,
             line_width=1,
             line_color="darkred",
             annotation_text=f"{m_year}년<br>(관측 없음)",
             annotation_position="top left",
-            annotation_font=dict(size=10, color="darkred")
+            annotation_font=dict(size=9, color="darkred")
         )
     
     fig.update_layout(
@@ -190,14 +190,15 @@ try:
         xaxis=dict(title="연도", showgrid=True),
         yaxis=dict(title="기온 (°C)", showgrid=True),
         hovermode="x unified",
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        margin=dict(t=80, b=40, l=40, r=40)
     )
     
     st.plotly_chart(fig, use_container_width=True)
     
     st.markdown("---")
     
-    # 8. 요약 통계 (행: 통계 항목, 열: 지점·평균기온·최저기온·최고기온)
+    # 8. 요약 통계
     st.subheader("📋 원본 데이터 전체 속성 요약 통계")
     st.caption(f"선택한 구간({selected_years[0]}년 ~ {selected_years[1]}년) 동안 수집된 원본 데이터의 요약 통계표입니다.")
     
@@ -217,7 +218,7 @@ try:
     
     st.dataframe(summary_stats.round(2), use_container_width=True)
     
-    # 9. 상세 데이터 보기 (탭)
+    # 9. 상세 데이터 보기 (오류 수정 부분: 중복 할당 제거)
     with st.expander("📄 상세 데이터 테이블 보기"):
         tab1, tab2 = st.tabs(["연도별 집계 데이터", "일별 원본 전체 데이터"])
         with tab1:
