@@ -130,15 +130,15 @@ try:
     
     st.markdown("---")
     
-    # 7. 전체 속성(지점, 평균기온, 최저기온, 최고기온) 요약 통계
+    # 7. 요약 통계 (행: 통계 항목, 열: 지점·평균기온·최저기온·최고기온)
     st.subheader("📋 원본 데이터 전체 속성 요약 통계")
-    st.caption(f"선택한 구간({selected_years[0]}년 ~ {selected_years[1]}년) 동안 수집된 원본 데이터의 모든 수치 속성 통계량입니다.")
+    st.caption(f"선택한 구간({selected_years[0]}년 ~ {selected_years[1]}년) 동안 수집된 원본 데이터의 요약 통계표입니다.")
     
-    # 원본 CSV의 모든 속성 포함 (지점, 평균기온, 최저기온, 최고기온)
     all_target_cols = [cols["point"], cols["avg"], cols["min"], cols["max"]]
-    summary_stats = filtered_raw_df[all_target_cols].describe().T
+    summary_stats = filtered_raw_df[all_target_cols].describe()
     
-    summary_stats = summary_stats.rename(columns={
+    # 행(인덱스) 한글화
+    summary_stats = summary_stats.rename(index={
         "count": "관측 수(건)",
         "mean": "평균",
         "std": "표준편차",
